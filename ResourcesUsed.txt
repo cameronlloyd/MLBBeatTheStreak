@@ -1,0 +1,7 @@
+How many at bats are considered for a streak?: http://retrosheet.org/Research/LevineD/HotStreaks.pdf (page 13).
+
+Attributes/Statistics Info: http://www.ryanhmckenna.com/2016/03/beat-streak-2016-looking-for-help.html
+
+MLB Official Stats (limited): http://gd2.mlb.com/components/game/mlb/
+
+Previous Team's Results (Page 5 containing statistics they used): http://cs229.stanford.edu/proj2013/Goodman-BeatingTheStreak.pdf

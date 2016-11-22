@@ -1,0 +1,29 @@
+For each game played in the season, we want to get the starting lineup. From there, we get data from
+both of the starting pitchers. All of the data we want is career Hits/Plate Appearances. For pitchers,
+we want to get their handedness for pitching, how well they do when home versus away, and how well they
+perform against a right handed batter and a left handed batter. Then we go to each starting batter and
+get their handedness, how well they do when home versus away, and how well they perform against the 
+pitcher's handedness. In the end, for a single game we should have 18 total rows of data. Each row
+will look like:
+
+Row = [dateOfGame, batterName, batterVsPitcherHand, batterLocation, pitcherVsBatterHand, pitcherLocation, hit]
+where:
+batterVsPitcherHand, batterLocation, pitcherVsBatterHand, pitcherLocation are all Hits/Plate Appearances.
+hit is either 0 or 1, depending on if that certain player got a hit on that date
+
+We should also obtain the number of At Bat Appearances for batters. We could possibly exclude
+individuals with low sample sizes in order to avoid outliers.
+
+{DateOfGame, Batter Name, Pitcher Name, vRHP, At Home, vLHB, Away, Hit on this day, At bats at game}
+	-	Date of game played
+	-	Batters name (either home or away)
+	-	Pitchers name (opposite of batters team (i.e if batter home, pitcher away))
+	-	(hits/AB) of batter v hand of pitcher
+	-	(hits/AB) of batter when either home or away
+	-	(hits/AB) of pitcher v hand of batter
+	-	(hits/AB) of pitcher when either home or away
+	-	If batter got hit in current game (Either 1 or 0)
+	-	How many at bats batter had 
+
+
+### NOTE: if batter handedness if both, takes average of RHP and LHP performance, and vice-versa 
