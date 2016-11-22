@@ -33,4 +33,4 @@ vignettes/*.pdf
 *.knit.md
 
 # Ignoring SVN files
-.svn/*
+.svn
