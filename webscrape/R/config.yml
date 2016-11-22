@@ -81,7 +81,7 @@ default:
     SFG: "SFG"		
     SEA: "SEA"
     STL: "STL"
-    TBR: "TBR"				
+    TBR: ["TBR","TBA"]				
     TEX: "TEX"
     TOR: "TOR"
     WSN: "WSN"

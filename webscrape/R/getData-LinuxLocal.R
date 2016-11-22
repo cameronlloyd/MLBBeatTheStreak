@@ -75,8 +75,8 @@ scrapeDay <- function(year,month,day) {
   date = paste(year,month,day,sep="-")
   link = paste("http://www.baseball-reference.com/games/standings.cgi?date=",date,sep="")
   
-  dayInBaseball = html(link) #These two lines are not protected
-  game.links = xpathSApply(dayInBaseball, "//pre/a[starts-with(@href,'/boxes/')]", xmlGetAttr, "href")
+  dayInBaseball = read_html(link) #These two lines are not protected
+  game.links = html_nodes(dayInBaseball, xpath="//pre/a[starts-with(@href,'/boxes/')]") %>% xml_attr("href")
   
   
   for (link in game.links) {
@@ -112,8 +112,8 @@ scrapeGame <-function(game.link,month) {
   homeTeam = homeTeam[5]
   parkFactor = getParkFactor(homeTeam)
   
-  startingLineups = xpathSApply(gameInBaseball,"//div[@id='div_lineups']//a[starts-with(@href,'/players/')]",xmlGetAttr,"href") #An array of the links of all players we are interested in for this game
-
+  startingLineups = html_nodes(gameInBaseball,xpath="//div[@id='div_lineups']//a[starts-with(@href,'/players/')]") %>% xml_attr("href")#An array of the links of all players we are interested in for this game
+  
   awayBatters=NULL
   homeBatters=NULL
   awayPitcher=NULL
@@ -129,8 +129,8 @@ scrapeGame <-function(game.link,month) {
   else {
     awayBatters = startingLineups[seq(1,length(startingLineups),2)] #links for awayBatters
     homeBatters = startingLineups[seq(2,length(startingLineups),2)] #links for homeBatters 
-    pitchers = xpathSApply(gameInBaseball,"//table[contains(@id,'pitching')]//td[@csk='0']//a[starts-with(@href,'/players/')]",xmlGetAttr,"href") #Go through the pitching tables to grab the pitchers
-
+    pitchers = html_nodes(gameInBaseball,xpath="//table[contains(@id,'pitching')]//td[@csk='0']//a[starts-with(@href,'/players/')]") %>% xml_attr("href") #Go through the pitching tables to grab the pitchers
+    
     #Note the assumption that the starting pitcher is the first row in this table (which I believe is a safe assumption)
     awayPitcher = pitchers[1] #The first pitching table is always the away pitcher.
     homePitcher = pitchers[2]
@@ -154,7 +154,8 @@ scrapeGame <-function(game.link,month) {
   
   #Create a table with column 1=player link, column 2=Did player get hit in the game [This table includes all who batted in the game]
   #THIS IS HOW WE GET INFORMATION ABOUT THE GAME!
-  battingPlayers = xpathSApply(gameInBaseball,"//table[contains(@id,'batting')]//tbody//a[starts-with(@href,'/players/')]",xmlGetAttr,"href")
+  battingPlayers = html_nodes(gameInBaseball,xpath="//table[contains(@id,'batting')]//tbody//a[starts-with(@href,'/players/')]") %>% xml_attr("href")
+  
   battingHits = gameInBaseball %>% html_nodes(xpath="//table[contains(@id,'batting')]//tbody//tr[starts-with(@class,'normal')]//td[4]") %>% html_text()
   atBats = gameInBaseball %>% html_nodes(xpath="//table[contains(@id,'batting')]//tbody//tr[starts-with(@class,'normal')]//td[2]") %>% html_text()
   hitTable = data.frame(player.link = battingPlayers, hit = as.numeric(battingHits)>0,atBats = as.numeric(atBats))
@@ -176,7 +177,7 @@ scrapeGame <-function(game.link,month) {
 
 
 
-  
+
 #Return: Performance against lefties, performance against righties, handedness, performance where they are playing (either home or away)
 #home is a boolean: True if batter is playing this game at home; false otherwise
 #pitcherData : A vector of four things [PitcherDataCareer,PitcherData2015,PitcherData2014,PitcherDataMonth] (The first three elements are lists.The last element is a number)
@@ -185,7 +186,7 @@ scrapeGame <-function(game.link,month) {
 #Each element of pitcherData is a list: [Handedness,againstRightiesAVG,againstLeftiesAVG,avgPlace,appsRight,appsLeft,appsPlace]
 #This function returns a row for a batter-pitcher pair in a game. This row has data for the career for the players, for 2015, and for 2014
 createRow <-function(batter.link,home,pitcherData,hitTable,month,parkFactor) {
-
+  
   
   Career.Dat = pitcherBatterYear(batter.link,home,pitcherData[[1]],'Career',month)
   Career.Dat.Standard = Career.Dat[,head(1:ncol(Career.Dat),n=-2)] #only take columns that are available for each year
@@ -221,8 +222,8 @@ grabPitcherSplitInfo <- function(pitcher.link,year,home,month) {
   pitcherID = extractID(pitcher.link)
   pitcherSplitLink = paste("http://www.baseball-reference.com/players/split.cgi?id=",pitcherID,"&year=",year,"&t=p",sep="") #This grabs the Career statistics. WE WILL PROBABLY NOT WANT THIS
   
-  pitcherHTML = html(pitcherSplitLink)
-
+  pitcherHTML = read_html(pitcherSplitLink)
+  
   handedness = extractHand(pitcherHTML,TRUE)
   
   
@@ -278,7 +279,7 @@ grabPitcherSplitInfo <- function(pitcher.link,year,home,month) {
     pitcherInfo = c(pitcherInfo,pitcherInMonth)
     return(pitcherInfo)
   }
-
+  
 }
 
 
@@ -295,13 +296,14 @@ grabPitcherSplitInfo <- function(pitcher.link,year,home,month) {
 #month: The month of the game being scraped. This is used to pull the players career average within a given month
 pitcherBatterYear <-function(batter.link,home,opp.PitcherData,year,month) {
   print(batter.link)
-
+  
   
   #print(batter.link)
   batterID = extractID(batter.link)
   batterSplitLink = paste("http://www.baseball-reference.com/players/split.cgi?id=",batterID,"&year=",year,"&t=b",sep="") #This grabs the Career statistics. WE WILL PROBABLY NOT WANT THIS
   print(batterSplitLink)
-  batterHTML = html(batterSplitLink)
+  batterHTML = read_html(batterSplitLink)
+  
   batterHand = extractHand(batterHTML,FALSE)
   
   #platoon splits: This might not be most efficient -- but I'm doing it because the other way (to grab the table directly, may actually be less efficient)
@@ -382,7 +384,7 @@ pitcherBatterYear <-function(batter.link,home,opp.PitcherData,year,month) {
   
   samplePlaceBatter = appsPlace
   samplePlacePitcher = opp.PitcherData[7]
-
+  
   
   if (length(avgPlaceBatter)==0) {avgPlaceBatter=NA}
   if (length(avgPlacePitcher)==0) {avgPlacePitcher=NA}
@@ -479,7 +481,7 @@ getParkFactor <- function(homeTeam){
       }
     }
   }, error = function(e){cat("ERROR:",conditionMessage(e),"\n")})
-
+  
   return (parkFactor)
 }
 
@@ -534,7 +536,7 @@ extractHand <-function(player.HTML,is.pitcher) {
   #  print(player.HTML)
   #}
   textVectors = player.HTML %>% html_nodes('p') %>% html_text()
-
+  
   #print(textVectors)
   
   for (text in textVectors){
