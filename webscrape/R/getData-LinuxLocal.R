@@ -26,11 +26,15 @@ scrapeCalender <- function(startDate,endDate) {
     month = unlist(splitDate)[2]
     day = unlist(splitDate)[3]
     
-    dataFromDay = scrapeDay(year,month,day)
-    data = rbind(data,dataFromDay)
-    saveRDS(data,file=paste(as.character(dates[i])," Data.rda",sep=""))
+    tryCatch({
+      dataFromDay = scrapeDay(year,month,day)
+      data = rbind(data,dataFromDay)
+      saveRDS(data,file=paste(as.character(dates[i])," Data.rda",sep=""))
+    }, error = function(e){
+      cat("ERROR:",conditionMessage(e),"\n")
+      })
   }
-  
+
   data = cleanData(data)
   
   return (data)
@@ -84,10 +88,10 @@ scrapeDay <- function(year,month,day) {
     print("Scraping a game now")
     print(paste("The link for the game being scraped now is: ",link,sep=""))
     
-    tryCatch({
-      gameFrame = scrapeGame(link,as.numeric(month))
-      result = rbind(result,gameFrame)
-    }, error = function(e){cat("ERROR:",conditionMessage(e),"\n")})
+    
+    gameFrame = scrapeGame(link,as.numeric(month))
+    result = rbind(result,gameFrame)
+    
     print("Finished scraping game")
   }
   
@@ -172,6 +176,7 @@ scrapeGame <-function(game.link,month) {
     result = rbind(result,createRow(batter,TRUE,awayPitcherData,hitTable,month,parkFactor))
   }
   
+  closeAllConnections()
   return (result)
 }
 
@@ -419,30 +424,43 @@ pitcherBatterYear <-function(batter.link,home,opp.PitcherData,year,month) {
 scrapeMonth <- function(player.page,month,pitcher) {
   monthRow = player.page %>% html_nodes(xpath='//table[@id="month"]/tbody');
   
-  #month = as.numeric(month)
+  # Get the string name of the month  
   if (month == 3 || month == 4){
-    monthRow = monthRow %>% html_nodes(xpath='.//tr[1]') 
+    month = "April/March"
   }
   else if(month == 5){
-    monthRow = monthRow %>% html_nodes(xpath='.//tr[2]')
+    month = "May"
   }
   else if(month == 6){
-    monthRow = monthRow %>% html_nodes(xpath='.//tr[3]')
+    month = "June"
   }
   else if(month == 7){
-    monthRow = monthRow %>% html_nodes(xpath='.//tr[4]')
+    month = "July"
   }
   else if(month == 8){
-    monthRow = monthRow %>% html_nodes(xpath='.//tr[5]')
+    month = "August"
   }
   else if(month == 9 || month == 10){
-    monthRow = monthRow %>% html_nodes(xpath='.//tr[6]')
+    month = "Sept/Oct"
   }
   else {
     # This shouldn't occur..
-    monthRow = NA
+    month = NA
   }
   
+  # Get the HTML row of month
+  rows = monthRow %>% html_nodes(xpath='./tr')
+  if (!is.na(monthRow)){
+    for (row in rows){
+      curr = row %>% html_nodes(xpath='./td[2]') %>% html_text()
+      if (grepl(curr, month)){
+        monthRow = row
+        break
+      }
+    }
+  }
+  
+  # Get Hits/PA for row of month
   monthAVG = NA
   if (!is.na(monthRow)){
     if (pitcher){
@@ -480,7 +498,9 @@ getParkFactor <- function(homeTeam){
         break
       }
     }
-  }, error = function(e){cat("ERROR:",conditionMessage(e),"\n")})
+  }, error = function(e){
+    cat("ERROR:",conditionMessage(e),"\n")
+    })
   
   return (parkFactor)
 }
@@ -586,7 +606,8 @@ cleanData <- function(data) {
 
 
 
-startDate = "2016/4/3"
-endDate = "2016/4/3"
+startDate = "2016/7/17"
+# endDate = "2016/8/17"
+endDate = "2016/10/2"
 dat = scrapeCalender(startDate,endDate)
 write.csv(dat,file="baseballData.csv")
