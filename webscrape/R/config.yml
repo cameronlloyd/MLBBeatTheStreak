@@ -59,8 +59,8 @@ default:
     ATL: "ATL"
     BAL: "BAL"
     BOS: "BOS"
-    CHC: "CHC"
-    CHW: "CHW"			
+    CHC: ["CHC", "CHN"]
+    CHW: ["CHW", "CHA"]			
     CIN: "CIN"
     CLE: "CLE"
     COL: "COL"
@@ -68,20 +68,20 @@ default:
     HOU: "HOU"
     KCR: ["KCR", "KCA"]	
     LAA: ["ANA", "LAA"]
-    LAD: "LAD"
-    FLA: "FLA"
+    LAD: ["LAD", "LAN"]
+    FLA: ["FLA", "MIA"]
     MIL: "MIL"
     MIN: "MIN"
-    NYM: "NYM"				
-    NYY: "NYY"
+    NYM: ["NYM", "NYN"]				
+    NYY: ["NYY", "NYA"]
     OAK: "OAK"
     PHI: "PHI"
     PIT: "PIT"
-    SDP: "SDP"
-    SFG: "SFG"		
+    SDP: ["SDP", "SDN"]
+    SFG: ["SFG", "SFN"]		
     SEA: "SEA"
-    STL: "STL"
+    STL: ["STL", "SLN"]
     TBR: ["TBR","TBA"]				
     TEX: "TEX"
     TOR: "TOR"
-    WSN: "WSN"
+    WSN: ["WSN", "WAS"]

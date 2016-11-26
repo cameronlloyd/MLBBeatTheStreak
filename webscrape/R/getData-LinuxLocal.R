@@ -300,13 +300,13 @@ grabPitcherSplitInfo <- function(pitcher.link,year,home,month) {
 #year: One of 'Career', '2016', '2015', etc. Year determines which link will be scraped
 #month: The month of the game being scraped. This is used to pull the players career average within a given month
 pitcherBatterYear <-function(batter.link,home,opp.PitcherData,year,month) {
-  print(batter.link)
+  # print(batter.link)
   
   
   #print(batter.link)
   batterID = extractID(batter.link)
   batterSplitLink = paste("http://www.baseball-reference.com/players/split.cgi?id=",batterID,"&year=",year,"&t=b",sep="") #This grabs the Career statistics. WE WILL PROBABLY NOT WANT THIS
-  print(batterSplitLink)
+  # print(batterSplitLink)
   batterHTML = read_html(batterSplitLink)
   
   batterHand = extractHand(batterHTML,FALSE)
@@ -502,6 +502,10 @@ getParkFactor <- function(homeTeam){
     cat("ERROR:",conditionMessage(e),"\n")
     })
   
+  if (parkFactor == -1){
+    print(paste("Team: ",homeTeam," not found in parkfactor table.",sep=""))  
+  }
+  
   return (parkFactor)
 }
 
@@ -606,8 +610,7 @@ cleanData <- function(data) {
 
 
 
-startDate = "2016/7/17"
-# endDate = "2016/8/17"
+startDate = "2016/9/24"
 endDate = "2016/10/2"
 dat = scrapeCalender(startDate,endDate)
 write.csv(dat,file="baseballData.csv")
