@@ -610,7 +610,7 @@ cleanData <- function(data) {
 
 
 
-startDate = "2016/9/24"
-endDate = "2016/10/2"
+startDate = "2016/7/16"
+endDate = "2016/7/16"
 dat = scrapeCalender(startDate,endDate)
 write.csv(dat,file="baseballData.csv")
